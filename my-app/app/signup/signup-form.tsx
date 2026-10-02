@@ -61,7 +61,7 @@ export function SignupForm(){
                 {state.errors?.password && <p id="password-error">{state.errors.password}</p>}
             </div>
 
-            {state.message && <p aria-live="polite">{state.message}</p>}
+            {state.message && <p role="alert">{state.message}</p>}
             <button type="submit" disabled={pending}>
                 {pending ? 'Submitting...' : 'Sign Up'}
             </button>
