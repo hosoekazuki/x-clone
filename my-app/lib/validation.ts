@@ -61,6 +61,7 @@ function validatePassword(password: string): string | undefined {
     return undefined;
 }
 
+// サインアップ時のバリデーションを行う関数
 export function validateSignup(formData: FormData): SignupValidationResult {
     const input: SignupInput = {
         username: getString(formData, 'username').trim(),
@@ -78,4 +79,41 @@ export function validateSignup(formData: FormData): SignupValidationResult {
         return {success: false, errors};
     }
     return {success: true, data: input};
+}
+
+/* ログイン時のバリデーション処理 */
+export type LoginInput = {
+    email: string;
+    password: string;
+};
+
+export type LoginErrors = Partial<Record<keyof LoginInput, string>>;
+
+export type LoginValidationResult = 
+    | { success: true; data: LoginInput }
+    | { success: false; errors: LoginErrors };
+
+// ログイン時のバリデーションを行う関数
+export function validateLogin(formData: FormData): LoginValidationResult{
+    const input: LoginInput = {
+        email: getString(formData, 'email').trim().toLowerCase(),
+        password: getString(formData, 'password'),
+    };
+
+    const errors: LoginErrors = {};
+    if(input.email === ''){
+        errors.email = 'メールアドレスを入力してください';
+    }else if(input.email.length > EMAIL_MAX_LENGTH){
+        errors.email = `メールアドレスは${EMAIL_MAX_LENGTH}文字以内で入力してください`;
+    }
+    if(input.password === ''){
+        errors.password = 'パスワードを入力してください';
+    }else if(input.password.length > PASSWORD_MAX_LENGTH){
+        errors.password = `パスワードは${PASSWORD_MAX_LENGTH}文字以内で入力してください`;
+    }
+
+    if(Object.keys(errors).length > 0){
+        return { success: false, errors }; 
+    }
+    return { success: true, data: input };
 }
