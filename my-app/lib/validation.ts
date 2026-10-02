@@ -5,6 +5,7 @@ export const USERNAME_PATTERN = /^[a-zA-Z0-9_]+$/;
 export const EMAIL_MAX_LENGTH = 255;
 export const PASSWORD_MIN_LENGTH = 8;
 export const PASSWORD_MAX_LENGTH = 64;
+export const POST_MAX_LENGTH = 280;
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -66,7 +67,7 @@ export function validateSignup(formData: FormData): SignupValidationResult {
     const input: SignupInput = {
         username: getString(formData, 'username').trim(),
         email: getString(formData, 'email').trim().toLowerCase(),
-        password: getString(formData, 'password'),
+        password: getString(formData, 'password').trim(),
     };
 
     const errors: SignupErrors = {
@@ -97,7 +98,7 @@ export type LoginValidationResult =
 export function validateLogin(formData: FormData): LoginValidationResult{
     const input: LoginInput = {
         email: getString(formData, 'email').trim().toLowerCase(),
-        password: getString(formData, 'password'),
+        password: getString(formData, 'password').trim(),
     };
 
     const errors: LoginErrors = {};
@@ -116,4 +117,28 @@ export function validateLogin(formData: FormData): LoginValidationResult{
         return { success: false, errors }; 
     }
     return { success: true, data: input };
+}
+
+// 投稿時のバリデーション処理
+export type PostInput = {
+    content: string;
+};
+
+export type PostErrors = Partial<Record<keyof PostInput, string>>;
+
+export type PostValidationResult = 
+    | { success: true; data: PostInput }
+    | { success: false; errors: PostErrors };
+
+// 投稿時のバリデーションを行う関数
+export function validatePost(formData: FormData): PostValidationResult{
+    const content = getString(formData, 'content').replace(/\r\n/g, '\n').trim();
+
+    if(content === ''){
+        return { success: false, errors: { content: '投稿内容を入力してください' } };
+    }
+    if([...content].length > POST_MAX_LENGTH){
+        return { success: false, errors: { content: `投稿内容は${POST_MAX_LENGTH}文字以内で入力してください` } };
+    }
+    return { success: true, data: { content } };
 }
