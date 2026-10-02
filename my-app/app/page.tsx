@@ -1,5 +1,6 @@
 import { requireUser } from '@/lib/auth/session';
 import { logout } from '@/lib/auth/actions';
+import { PostForm } from './post-form';
 
 export default async function HomePage(){
   const user = await requireUser();
@@ -10,6 +11,7 @@ export default async function HomePage(){
       <form action={logout}>
         <button type="submit">ログアウト</button>
       </form>
+      <PostForm />
     </main>
   );
 }
