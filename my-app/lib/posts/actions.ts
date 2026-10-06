@@ -4,7 +4,7 @@ import { DrizzleQueryError } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 import { requireUser } from '@/lib/auth/session';
 import { validatePost } from '@/lib/validation';
-import { insertPost } from '@/lib/posts/data';
+import { deleteOwnPost, insertPost } from '@/lib/posts/data';
 
 export type CreatePostState = {
     errors?: {
@@ -30,7 +30,6 @@ export async function createPost(
     if(!result.success){
         return { errors: result.errors, values };
     }
-
     try{
         await insertPost(user.id, result.data.content);
     }catch(error){
@@ -39,4 +38,19 @@ export async function createPost(
     }
     revalidatePath('/'); // 投稿後にトップページを再検証する
     return {}; // 投稿に成功した場合は空のオブジェクトを返す
+}
+
+// 投稿を削除する
+export async function deletePost(postId: unknown): Promise<void>{
+    const user = await requireUser();
+    if(typeof postId !== 'number' || !Number.isSafeInteger(postId) || postId <=0){
+        return;
+    }
+    try{
+        await deleteOwnPost(postId, user.id);   
+    }catch(error){
+        console.error('投稿の削除に失敗しました', error instanceof DrizzleQueryError ? error.cause : error);
+        return;
+    }
+    revalidatePath('/'); // 投稿削除後にトップページを再検証する
 }

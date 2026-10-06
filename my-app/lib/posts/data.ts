@@ -1,6 +1,6 @@
 // 投稿に関するDB操作をまとめたファイル
 import 'server-only';
-import { desc, eq } from 'drizzle-orm';
+import { and, desc, eq } from 'drizzle-orm';
 import { db } from '@/db';
 import { posts, users } from '@/db/schema';
 
@@ -28,4 +28,13 @@ export async function getTimelinePosts() {
 // 投稿を保存する。
 export async function insertPost(userId: number, content: string): Promise<void> {
     await db.insert(posts).values({ userId, content });
+}
+
+// 投稿を削除する
+export async function deleteOwnPost(postId: number, userId: number): Promise<boolean> {
+    const deleted = await db
+        .delete(posts)
+        .where(and(eq(posts.id, postId), eq(posts.userId, userId)))
+        .returning({ id: posts.id });
+    return deleted.length > 0;
 }
