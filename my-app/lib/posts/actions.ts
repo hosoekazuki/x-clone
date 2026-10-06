@@ -2,10 +2,9 @@
 
 import { DrizzleQueryError } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
-import { db } from '@/db';
-import { posts } from '@/db/schema';
 import { requireUser } from '@/lib/auth/session';
 import { validatePost } from '@/lib/validation';
+import { insertPost } from '@/lib/posts/data';
 
 export type CreatePostState = {
     errors?: {
@@ -33,10 +32,7 @@ export async function createPost(
     }
 
     try{
-        await db.insert(posts).values({
-            userId: user.id,
-            content: result.data.content,
-        });    
+        await insertPost(user.id, result.data.content);
     }catch(error){
         console.error('投稿に失敗しました', error instanceof DrizzleQueryError ? error.cause : error);
         return { message: '投稿に失敗しました', values };
