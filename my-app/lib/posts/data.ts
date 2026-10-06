@@ -25,6 +25,8 @@ export async function getTimelinePosts() {
         .limit(TIMELINE_LIMIT);
 }
 
+export type TimelinePost = Awaited<ReturnType<typeof getTimelinePosts>>[number];
+
 // 投稿を保存する。
 export async function insertPost(userId: number, content: string): Promise<void> {
     await db.insert(posts).values({ userId, content });
