@@ -3,6 +3,8 @@
 
 import { useActionState } from 'react';
 import { signup, type SignupState } from './actions';
+import { TextField } from '@/components/ui/text-field';
+import { Button } from '@/components/ui/button';
 
 const initialState: SignupState = {};
 
@@ -10,12 +12,11 @@ export function SignupForm(){
     const [state, formAction, pending ] = useActionState(signup, initialState);
 
     return (
-        <form action={formAction}>
-            <div>
-                <label htmlFor="username">username</label>
-                <input
+        <form action={formAction} className="mt-6 space-y-4">
+                <TextField
                     id="username"
                     name="username"
+                    label="ユーザー名"
                     type="text"
                     autoComplete="username"
                     required
@@ -23,48 +24,38 @@ export function SignupForm(){
                     maxLength={15}
                     pattern="[a-zA-Z0-9_]+"
                     defaultValue={state.values?.username}
-                    aria-invalid={!!state.errors?.username}
-                    aria-describedby={state.errors?.username ? 'username-error' : undefined }
+                    error={state.errors?.username}
                 />
-                {state.errors?.username && <p id="username-error">{state.errors.username}</p>}
-            </div>
 
-            <div>
-                <label htmlFor="email">email</label>
-                <input 
+                <TextField
                     id="email"
                     name="email"
+                    label="メールアドレス"
                     type="email"
                     autoComplete="email"
                     required
                     maxLength={255}
                     defaultValue={state.values?.email}
-                    aria-invalid={!!state.errors?.email}
-                    aria-describedby={state.errors?.email ? 'email-error' : undefined}
+                    error={state.errors?.email}
                 />
-                {state.errors?.email && <p id="email-error">{state.errors.email}</p>}
-            </div>
 
-            <div>
-                <label htmlFor="password">password</label>
-                <input 
+                <TextField
                     id="password"
                     name="password"
+                    label="パスワード"
                     type="password"
                     autoComplete="new-password"
                     required
                     minLength={8}
                     maxLength={64}
-                    aria-invalid={!!state.errors?.password}
-                    aria-describedby={state.errors?.password ? 'password-error' : undefined}
-                />
-                {state.errors?.password && <p id="password-error">{state.errors.password}</p>}
-            </div>
+                    error={state.errors?.password}
 
-            {state.message && <p role="alert">{state.message}</p>}
-            <button type="submit" disabled={pending}>
-                {pending ? 'Submitting...' : 'Sign Up'}
-            </button>
+                />
+
+            {state.message && <p role="alert" className="text-sm text-red-600">{state.message}</p>}
+            <Button type="submit" disabled={pending} fullWidth>
+                {pending ? '登録中...' : '登録'}
+            </Button>
         </form>
     )
 }

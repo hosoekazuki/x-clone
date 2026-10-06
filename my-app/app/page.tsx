@@ -1,5 +1,4 @@
 import { requireUser } from '@/lib/auth/session';
-import { logout } from '@/lib/auth/actions';
 import { PostForm } from './post-form';
 import { getTimelinePosts } from '@/lib/posts/data';
 import { PostList } from '@/components/posts/post-list';
@@ -12,7 +11,7 @@ export default async function HomePage(){
     <>
       <Header username={user.username} />
       <main>
-        <h1>ホーム</h1>
+        <h1 className="border-b border-gray-200 px-4 py-3 text-xl font-bold">ホーム</h1>
         <PostForm />
         <PostList posts={posts} currentUserId={user.id} />
       </main>

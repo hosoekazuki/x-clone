@@ -4,6 +4,8 @@
 import { useActionState } from 'react';
 import { EMAIL_MAX_LENGTH, PASSWORD_MAX_LENGTH } from '@/lib/validation';
 import { login, type LoginState } from './actions';
+import { TextField } from '@/components/ui/text-field';
+import { Button } from '@/components/ui/button';
 
 const initialState: LoginState = {};
 
@@ -11,42 +13,34 @@ export function LoginForm(){
     const [state, formAction, pending] = useActionState(login, initialState);
 
     return (
-        <form action={formAction}>
-            <div>
-                <label htmlFor="email">メールアドレス</label>
-                <input 
-                    id="email"
-                    name="email"
-                    type="email"
-                    autoComplete="email"
-                    required
-                    maxLength={EMAIL_MAX_LENGTH}
-                    defaultValue={state.values?.email}
-                    aria-invalid={!!state.errors?.email}
-                    aria-describedby={state.errors?.email ? 'email-error' : undefined}
-                />
-                {state.errors?.email && <p id="email-error">{state.errors.email}</p>}
-            </div>
+        <form action={formAction} className="mt-6 space-y-4">
+            <TextField
+                id="email"
+                name="email"
+                label="メールアドレス"
+                type="email"
+                autoComplete="email"
+                required
+                maxLength={EMAIL_MAX_LENGTH}
+                defaultValue={state.values?.email}
+                error={state.errors?.email}
+            />
 
-            <div>
-                <label htmlFor="password">パスワード</label>
-                <input 
-                    id="password"
-                    name="password"
-                    type="password"
-                    autoComplete="current-password"
-                    required
-                    maxLength={PASSWORD_MAX_LENGTH}
-                    aria-invalid={!!state.errors?.password}
-                    aria-describedby={state.errors?.password ? 'password-error' : undefined}
-                />
-                {state.errors?.password && <p id="password-error">{state.errors.password}</p>}
-            </div>
-
-            {state.message && <p role="alert">{state.message}</p>}
-            <button type="submit" disabled={pending}>
+            <TextField
+                id="password"
+                name="password"
+                label="パスワード"
+                type="password"
+                autoComplete="current-password"
+                required
+                maxLength={PASSWORD_MAX_LENGTH}
+                error={state.errors?.password}
+            />
+            {state.message && <p role="alert" className="text-sm text-red-600">{state.message}</p>}
+            <Button type="submit" disabled={pending} fullWidth>
                 {pending ? 'ログイン中...' : 'ログイン'}
-            </button>
+            </Button>
         </form>
     );
 }
+

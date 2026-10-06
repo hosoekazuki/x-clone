@@ -8,9 +8,9 @@ export default function RootLayout( {
   return (
     <html lang="ja">
       <body>
-        <main>
+        <div className="mx-auto min-h-screen max-w-xl border-x border-gray-200">
           {children}
-        </main>
+        </div>
       </body>
     </html>
   )
