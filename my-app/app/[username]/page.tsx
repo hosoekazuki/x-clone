@@ -19,7 +19,7 @@ export default async function ProfilePage(props: PageProps<'/[username]'>){
     const currentUser = await requireUser();
     const profileUser = await getUserByUsername(username);
     if(!profileUser) notFound();
-    const posts = await getUserPosts(profileUser.id);
+    const posts = await getUserPosts(profileUser.id, currentUser.id);
 
     const counts = await getFollowerCounts(profileUser.id);
     const isOwnProfile = profileUser.id === currentUser.id;
@@ -37,15 +37,16 @@ export default async function ProfilePage(props: PageProps<'/[username]'>){
                     <p className="mt-1 text-sm text-gray-600">
                         {joinedFormatter.format(profileUser.createdAt)}から利用しています。
                     </p>
-                        <p className="mt-2 text-gray-600">
-                            <span className="font-bold text-gray-900">{counts.followers}</span> フォロワー
-                            <span className="ml-4 font-bold text-gray-900">{counts.following}</span> フォロー中
-                        </p>
-                        {!isOwnProfile && (
-                            <div className="mt-3">
-                                <FollowButton userId={profileUser.id} isFollowing={following} />
-                            </div>
-                        )}
+                    <p className="mt-2 text-gray-600">
+                        <span className="font-bold text-gray-900">{counts.followers}</span> フォロワー
+                        <span className="ml-4 font-bold text-gray-900">{counts.following}</span> フォロー中
+                    </p>
+                    {!isOwnProfile && (
+                        <div className="mt-3">
+                            <FollowButton userId={profileUser.id} isFollowing={following} />
+                        </div>
+                    )}
+    
                 </section>
                 <PostList posts={posts} currentUserId={currentUser.id} />
             </main>

@@ -8,6 +8,7 @@ import { POST_MAX_LENGTH } from '@/lib/validation';
 const initialState: CreatePostState = {};
 
 export function PostForm(){
+    const [content, setContent] = useState("");
     const [state, formAction, pending] = useActionState(
         async (prevState: CreatePostState, formData: FormData)=> {
             const result = await createPost(prevState, formData);
@@ -18,10 +19,9 @@ export function PostForm(){
         },
         initialState
     );
-    const [content, setContent] = useState("");
 
     const length = [...content].length;
-    const isOver = length > 280;
+    const isOver = length > POST_MAX_LENGTH;
     return (
         <form action={formAction} className="border-b border-gray-200 px-4 py-3">
             <label htmlFor="content" className="sr-only">投稿内容</label>
