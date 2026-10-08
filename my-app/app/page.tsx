@@ -7,7 +7,7 @@ import { ProfileLink } from '@/components/layout/profile-link';
 
 export default async function HomePage(){
   const user = await requireUser();
-  const posts = await getTimelinePosts();
+  const posts = await getTimelinePosts(user.id);
   return (
     <>
       <Header username={user.username}>

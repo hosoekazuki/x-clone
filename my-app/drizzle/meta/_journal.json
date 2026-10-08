@@ -15,6 +15,13 @@
       "when": 1791438152862,
       "tag": "0001_silent_microbe",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1791447366074,
+      "tag": "0002_mature_jocasta",
+      "breakpoints": true
     }
   ]
 }

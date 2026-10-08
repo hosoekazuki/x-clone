@@ -45,3 +45,14 @@ export const follows = pgTable('follows', {
         check('follows_no_self_follow', sql`${t.followerId} <> ${t.followingId}`),
     ]
 )
+
+export const likes = pgTable('likes', {
+    userId: integer().notNull().references(() => users.id, { onDelete: 'cascade'}),
+    postId: integer().notNull().references(() => posts.id, { onDelete: 'cascade'}),
+    createdAt: timestamp({ withTimezone: true }).notNull().defaultNow()
+    },
+    (t) => [
+        primaryKey({ columns: [t.userId, t.postId] }),
+        index('likes_post_id_idx').on(t.postId),
+        ]
+)

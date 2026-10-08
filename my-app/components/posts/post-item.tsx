@@ -1,6 +1,7 @@
 import { deletePost } from '@/lib/posts/actions';
 import type { TimelinePost } from '@/lib/posts/data';
 import Link from 'next/link';
+import { LikeButton } from '@/components/posts/like-button';
 
 const dateFormatter = new Intl.DateTimeFormat('ja-JP', {
     timeZone: 'Asia/Tokyo',
@@ -39,6 +40,7 @@ export function PostItem({ post, isOwner }: PostItemProps){
                     </button>
                 </form>
             )}
+            <LikeButton postId={post.id} likeCount={post.likeCount} likedByMe={post.likedByMe} />
         </li>
     )
 }

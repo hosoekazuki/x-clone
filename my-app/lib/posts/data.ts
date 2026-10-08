@@ -1,13 +1,13 @@
 // 投稿に関するDB操作をまとめたファイル
 import 'server-only';
-import { and, desc, eq } from 'drizzle-orm';
+import { and, desc, eq, sql } from 'drizzle-orm';
 import { db } from '@/db';
-import { posts, users } from '@/db/schema';
+import { posts, users, likes } from '@/db/schema';
 
 const TIMELINE_LIMIT = 50; // タイムラインに表示する投稿の最大数
 
 // タイムラインに表示する投稿を取得する
-export async function getTimelinePosts() {
+export async function getTimelinePosts(currentUserId: number) {
     return db
         .select({
             id: posts.id,
@@ -18,6 +18,17 @@ export async function getTimelinePosts() {
                 username: users.username,
                 image: users.image,
             },
+            // 投稿のいいね数を取得する
+            likeCount: sql<number>`(
+                select count(*)::int from ${likes}
+                where ${likes.postId} = ${posts.id}
+            )`,
+            // ログイン中のユーザーがこの投稿にいいねしているかどうかを取得する
+            likedByMe: sql<boolean>`exists(
+                select 1 from ${likes}
+                where ${likes.userId} = ${currentUserId}
+                and ${likes.postId} = ${posts.id}
+            )`,
         })
         .from(posts)
         .innerJoin(users, eq(posts.userId, users.id))
@@ -25,7 +36,7 @@ export async function getTimelinePosts() {
         .limit(TIMELINE_LIMIT);
 }
 
-export async function getUserPosts(userId: number) {
+export async function getUserPosts(userId: number, currentUserId: number) {
     return db
         .select({
             id: posts.id,
@@ -36,6 +47,17 @@ export async function getUserPosts(userId: number) {
                 username: users.username,
                 image: users.image,
             },
+            // 投稿のいいね数を取得する
+            likeCount: sql<number>`(
+                select count(*)::int from ${likes}
+                where ${likes.postId} = ${posts.id}
+            )`,
+            // ログイン中のユーザーがこの投稿にいいねしているかどうかを取得する
+            likedByMe: sql<boolean>`exists(
+                select 1 from ${likes}
+                where ${likes.userId} = ${currentUserId}
+                and ${likes.postId} = ${posts.id}
+            )`,
         })
         .from(posts)
         .innerJoin(users, eq(posts.userId, users.id))
