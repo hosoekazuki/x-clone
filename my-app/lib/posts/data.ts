@@ -25,6 +25,25 @@ export async function getTimelinePosts() {
         .limit(TIMELINE_LIMIT);
 }
 
+export async function getUserPosts(userId: number) {
+    return db
+        .select({
+            id: posts.id,
+            content: posts.content,
+            createdAt: posts.createdAt,
+            author: {
+                id: users.id,
+                username: users.username,
+                image: users.image,
+            },
+        })
+        .from(posts)
+        .innerJoin(users, eq(posts.userId, users.id))
+        .where(eq(posts.userId, userId))
+        .orderBy(desc(posts.createdAt), desc(posts.id))
+        .limit(TIMELINE_LIMIT);
+}
+
 export type TimelinePost = Awaited<ReturnType<typeof getTimelinePosts>>[number];
 
 // 投稿を保存する。

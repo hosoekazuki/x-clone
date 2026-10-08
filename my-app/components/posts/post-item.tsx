@@ -1,5 +1,6 @@
 import { deletePost } from '@/lib/posts/actions';
 import type { TimelinePost } from '@/lib/posts/data';
+import Link from 'next/link';
 
 const dateFormatter = new Intl.DateTimeFormat('ja-JP', {
     timeZone: 'Asia/Tokyo',
@@ -17,7 +18,12 @@ export function PostItem({ post, isOwner }: PostItemProps){
     return (
         <li className="border-b border-gray-200 px-4 py-3">
             <div className="flex items-center gap-2 text-sm">
-                <span className="font-bold">{post.author.username}</span>
+                <Link 
+                    href={`/${post.author.username}`}
+                    className="font-bold text-gray-900 hover:underline"
+                >
+                    {post.author.username}
+                </Link>
                 <time dateTime={post.createdAt.toISOString()} className="text-gray-500">
                     {dateFormatter.format(post.createdAt)}
                 </time>
