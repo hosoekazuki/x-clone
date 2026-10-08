@@ -1,14 +1,27 @@
 'use client';
 
-import { useActionState } from 'react';
+import { useActionState, useState } from 'react';
 import { createPost, type CreatePostState } from '@/lib/posts/actions';
 import { Button } from '@/components/ui/button';
+import { POST_MAX_LENGTH } from '@/lib/validation';
 
 const initialState: CreatePostState = {};
 
 export function PostForm(){
-    const [state, formAction, pending] = useActionState(createPost, initialState);
+    const [state, formAction, pending] = useActionState(
+        async (prevState: CreatePostState, formData: FormData)=> {
+            const result = await createPost(prevState, formData);
+            if(!result.errors && !result.message){
+                setContent("");
+            }
+            return result;
+        },
+        initialState
+    );
+    const [content, setContent] = useState("");
 
+    const length = [...content].length;
+    const isOver = length > 280;
     return (
         <form action={formAction} className="border-b border-gray-200 px-4 py-3">
             <label htmlFor="content" className="sr-only">投稿内容</label>
@@ -18,6 +31,7 @@ export function PostForm(){
                 rows={3}
                 required
                 placeholder="いまどうしてる？"
+                onChange={(e) => setContent(e.target.value)}
                 defaultValue={state.values?.content}
                 aria-invalid={!!state.errors?.content}
                 aria-describedby={state.errors?.content ? 'content-error' : undefined}
@@ -33,8 +47,11 @@ export function PostForm(){
                     {state.message}
                 </p>
             )}  
-            <div className="mt-2 flex justify-end">
-                <Button type="submit" disabled={pending}>
+            <div className="mt-2 flex items-center gap-3 justify-end">
+                <span className={isOver ? 'text-sm text-red-600' : 'text-sm text-gray-600'}>
+                    {length} / {POST_MAX_LENGTH}
+                </span>
+                <Button type="submit" disabled={pending || isOver}>
                     {pending ? '投稿中...' : '投稿'}
                 </Button>
             </div>
