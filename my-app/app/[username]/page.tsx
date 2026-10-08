@@ -5,7 +5,8 @@ import { getUserPosts } from '@/lib/posts/data';
 import { Header } from '@/components/layout/header';
 import { PostList } from '@/components/posts/post-list';
 import { HomeLink } from '@/components/layout/home-link';
-
+import { getFollowerCounts, isFollowing } from '@/lib/follows/data';
+import { FollowButton } from '@/components/follows/follow-button';
 
 const joinedFormatter = new Intl.DateTimeFormat('ja-JP', {
     timeZone: 'Asia/Tokyo',
@@ -19,6 +20,12 @@ export default async function ProfilePage(props: PageProps<'/[username]'>){
     const profileUser = await getUserByUsername(username);
     if(!profileUser) notFound();
     const posts = await getUserPosts(profileUser.id);
+
+    const counts = await getFollowerCounts(profileUser.id);
+    const isOwnProfile = profileUser.id === currentUser.id;
+    const following = isOwnProfile
+        ? false
+        : await isFollowing(currentUser.id, profileUser.id);
     return (
         <>
             <Header username={currentUser.username}>
@@ -30,6 +37,15 @@ export default async function ProfilePage(props: PageProps<'/[username]'>){
                     <p className="mt-1 text-sm text-gray-600">
                         {joinedFormatter.format(profileUser.createdAt)}から利用しています。
                     </p>
+                        <p className="mt-2 text-gray-600">
+                            <span className="font-bold text-gray-900">{counts.followers}</span> フォロワー
+                            <span className="ml-4 font-bold text-gray-900">{counts.following}</span> フォロー中
+                        </p>
+                        {!isOwnProfile && (
+                            <div className="mt-3">
+                                <FollowButton userId={profileUser.id} isFollowing={following} />
+                            </div>
+                        )}
                 </section>
                 <PostList posts={posts} currentUserId={currentUser.id} />
             </main>
