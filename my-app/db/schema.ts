@@ -30,7 +30,7 @@ export const posts = pgTable('posts', {
     },
     (t) => [
         check('posts_content_not_blank', sql`char_length(btrim(${t.content})) > 0`),
-        index('posts_user_id_created_at_idx').on(t.userId, t.createdAt)
+        index('posts_user_id_id_idx').on(t.userId, t.id)
     ],
 );
 
