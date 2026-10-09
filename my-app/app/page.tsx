@@ -4,10 +4,14 @@ import { getTimelinePosts } from '@/lib/posts/data';
 import { PostList } from '@/components/posts/post-list';
 import { Header } from '@/components/layout/header';
 import { ProfileLink } from '@/components/layout/profile-link';
+import { parseCursor } from '@/lib/pagination/pagination';
+import { LoadMoreLink } from '@/components/posts/load-more-link';
 
-export default async function HomePage(){
+export default async function HomePage(props: PageProps<'/'>) {
   const user = await requireUser();
-  const posts = await getTimelinePosts(user.id);
+  const { cursor: rawCursor } = await props.searchParams;
+  const cursor = parseCursor(rawCursor);
+  const { posts, nextCursor } = await getTimelinePosts(user.id, cursor);
   return (
     <>
       <Header username={user.username}>
@@ -17,6 +21,9 @@ export default async function HomePage(){
         <h1 className="border-b border-gray-200 px-4 py-3 text-xl font-bold">ホーム</h1>
         <PostForm />
         <PostList posts={posts} currentUserId={user.id} />
+        {nextCursor !== null && (
+          <LoadMoreLink href={`/?cursor=${nextCursor}`} />
+        )}
       </main>
     </>
   );

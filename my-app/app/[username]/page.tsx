@@ -7,6 +7,8 @@ import { PostList } from '@/components/posts/post-list';
 import { HomeLink } from '@/components/layout/home-link';
 import { getFollowerCounts, isFollowing } from '@/lib/follows/data';
 import { FollowButton } from '@/components/follows/follow-button';
+import { LoadMoreLink } from '@/components/posts/load-more-link';
+import { parseCursor } from '@/lib/pagination/pagination';
 
 const joinedFormatter = new Intl.DateTimeFormat('ja-JP', {
     timeZone: 'Asia/Tokyo',
@@ -19,13 +21,15 @@ export default async function ProfilePage(props: PageProps<'/[username]'>){
     const currentUser = await requireUser();
     const profileUser = await getUserByUsername(username);
     if(!profileUser) notFound();
-    const posts = await getUserPosts(profileUser.id, currentUser.id);
-
     const counts = await getFollowerCounts(profileUser.id);
     const isOwnProfile = profileUser.id === currentUser.id;
     const following = isOwnProfile
         ? false
         : await isFollowing(currentUser.id, profileUser.id);
+
+    const { cursor: rawCursor } = await props.searchParams;
+    const cursor = parseCursor(rawCursor);
+    const { posts, nextCursor } = await getUserPosts(profileUser.id, currentUser.id, cursor);
     return (
         <>
             <Header username={currentUser.username}>
@@ -46,9 +50,11 @@ export default async function ProfilePage(props: PageProps<'/[username]'>){
                             <FollowButton userId={profileUser.id} isFollowing={following} />
                         </div>
                     )}
-    
                 </section>
                 <PostList posts={posts} currentUserId={currentUser.id} />
+                {nextCursor !== null && (
+                    <LoadMoreLink href={`/${profileUser.username}?cursor=${nextCursor}`} />
+                )}
             </main>
         </>
     )
