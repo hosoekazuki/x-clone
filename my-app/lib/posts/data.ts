@@ -4,7 +4,7 @@ import { and, desc, eq, sql, lt } from 'drizzle-orm';
 import { db } from '@/db';
 import { posts, users, likes } from '@/db/schema';
 
-const PAGE_SIZE = 2; // タイムラインに表示する投稿の最大数
+const PAGE_SIZE = 9; // タイムラインに表示する投稿の最大数
 
 // タイムラインに表示する投稿を取得する
 async function getPosts(currentUserId: number, cursor?: number, authorId?: number) {
@@ -46,10 +46,12 @@ async function getPosts(currentUserId: number, cursor?: number, authorId?: numbe
 
 }
 
+// タイムラインに表示する投稿を取得する
 export function getTimelinePosts(currentUserId: number, cursor?: number) {
     return getPosts(currentUserId, cursor);
 }
 
+// 特定のユーザーの投稿を取得する
 export function getUserPosts(authorId: number, currentUserId: number, cursor?: number) {
     return getPosts(currentUserId, cursor, authorId);
 }
