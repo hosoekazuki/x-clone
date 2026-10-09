@@ -4,6 +4,7 @@ import { db } from '@/db';
 import { users } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 
+// ユーザー名からユーザー情報を取得する
 export async function getUserByUsername(username: string) {
     const [user] = await db
         .select({

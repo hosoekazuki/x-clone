@@ -7,6 +7,7 @@ const SCRYPT_MAXMEM = 256 * 1024 * 1024; // 256MB
 const SALT_LENGTH = 16;
 const KEY_LENGTH = 64;
 
+// scryptをPromiseでラップする関数
 function scryptAsync(
     password: string,
     salt: Buffer,
@@ -24,6 +25,7 @@ function scryptAsync(
     })
 }
 
+// パスワードをハッシュ化する関数
 export async function hashPassword(password: string): Promise<string>{
     const salt = randomBytes(SALT_LENGTH);
     const hash = await scryptAsync(password, salt, KEY_LENGTH, {
@@ -40,6 +42,7 @@ export async function hashPassword(password: string): Promise<string>{
     ].join('$');
 }
 
+// パスワードを検証する関数
 export async function verifyPassword(password: string, hashedPassword: string): Promise<boolean>{
     const [algorithm, N, r, p, saltB64, hashB64] = hashedPassword.split('$');
     if(algorithm !== 'scrypt' || !N || !r || !p || !saltB64 || !hashB64){

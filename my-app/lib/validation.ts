@@ -26,7 +26,7 @@ function getString(formData: FormData, key: string): string {
     return typeof value === 'string' ? value : '';
 }
 
-function validateUsername(username: string): string | undefined {
+export function validateUsername(username: string): string | undefined {
     if(username === ''){
         return 'Username is required';
     }
@@ -39,7 +39,7 @@ function validateUsername(username: string): string | undefined {
     return undefined;
 }
 
-function validateEmail(email: string): string | undefined{
+export function validateEmail(email: string): string | undefined{
     if(email === ''){
         return 'Email is required';
     }
@@ -52,7 +52,7 @@ function validateEmail(email: string): string | undefined{
     return undefined;
 }
 
-function validatePassword(password: string): string | undefined {
+export function validatePassword(password: string): string | undefined {
     if(password === ''){
         return 'Password is required';
     }
