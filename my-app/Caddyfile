@@ -1,0 +1,4 @@
+# DOMAIN 宛てのアクセスを受けて、HTTPS証明書を自動で取得し、appコンテナへ渡す
+{$DOMAIN} {
+	reverse_proxy app:3000
+}

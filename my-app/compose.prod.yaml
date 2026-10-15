@@ -1,0 +1,61 @@
+# 本番（EC2）用の構成。起動: docker compose -f compose.prod.yaml up -d --build
+services:
+  db:
+    image: postgres:18
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - postgres_data:/var/lib/postgresql
+    # ports は書かない = サーバーの外にもホストにも公開しない。appからだけ届く
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "${POSTGRES_USER}", "-d", "${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  app:
+    build:
+      context: .
+      target: runner
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+      # 前段の Caddy が付ける X-Forwarded-For を信頼してIPを取る
+      TRUST_PROXY: "true"
+    depends_on:
+      db:
+        condition: service_healthy
+    # ports は書かない。外からは Caddy 経由でしか届かない
+    restart: unless-stopped
+
+  # DBのテーブルを作る/更新するときだけ動かす: docker compose -f compose.prod.yaml run --rm migrate
+  migrate:
+    build:
+      context: .
+      target: migrator
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+    depends_on:
+      db:
+        condition: service_healthy
+    profiles: ["tools"]
+
+  caddy:
+    image: caddy:2
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      DOMAIN: ${DOMAIN}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+    depends_on:
+      - app
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  caddy_data:
