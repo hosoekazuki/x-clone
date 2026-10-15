@@ -92,6 +92,13 @@ export async function deleteSession(): Promise<void>{
     cookieStore.delete(SESSION_COOKIE_NAME);
 }
 
+// 全端末からログアウトする時に呼ぶ。そのユーザーの全セッションとクッキーを削除する。
+export async function deleteAllSessions(userId: number): Promise<void>{
+    await db.delete(sessions).where(eq(sessions.userId, userId));
+    const cookieStore = await cookies();
+    cookieStore.delete(SESSION_COOKIE_NAME);
+}
+
 // ログイン必須のページやserver actionで呼ぶ：未ログインなら/loginにリダイレクトする
 export async function requireUser(): Promise<SessionUser>{
     const user = await validateSession();

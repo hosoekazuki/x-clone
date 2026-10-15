@@ -5,6 +5,7 @@ import { getUserPosts } from '@/lib/posts/data';
 import { Header } from '@/components/layout/header';
 import { PostList } from '@/components/posts/post-list';
 import { HomeLink } from '@/components/layout/home-link';
+import { LogoutAllButton } from '@/components/layout/logout-all-button';
 import { getFollowerCounts, isFollowing } from '@/lib/follows/data';
 import { FollowButton } from '@/components/follows/follow-button';
 import { LoadMoreLink } from '@/components/posts/load-more-link';
@@ -37,7 +38,10 @@ export default async function ProfilePage(props: PageProps<'/[username]'>){
             </Header>    
             <main>
                 <section className="border-b border-gray-200 px-4 py-4">
-                    <h1 className="text-xl font-bold">{profileUser.username}</h1>
+                    <div className="flex items-center justify-between">
+                        <h1 className="text-xl font-bold">{profileUser.username}</h1>
+                        {isOwnProfile && <LogoutAllButton />}
+                    </div>
                     <p className="mt-1 text-sm text-gray-600">
                         {joinedFormatter.format(profileUser.createdAt)}から利用しています。
                     </p>
