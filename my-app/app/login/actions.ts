@@ -7,6 +7,17 @@ import { users } from '@/db/schema';
 import { hashPassword, verifyPassword } from '@/lib/auth/password';
 import { validateLogin } from '@/lib/validation';
 import { createSession } from '@/lib/auth/session';
+import { rateLimit } from '@/lib/rate-limit';
+import { getClientIp } from '@/lib/request-ip';
+
+// IP単位: 1つの発信元からのログイン連打（DoS・パスワードスプレー）を抑える
+const IP_MAX = 20;
+const IP_WINDOW_MS = 60 * 1000; // 1分
+// アカウント単位: 特定メール宛の総当たりを抑える
+const EMAIL_MAX = 5;
+const EMAIL_WINDOW_MS = 60 * 1000; // 1分
+
+const TOO_MANY_REQUESTS_MESSAGE = '試行回数が多すぎます。しばらくしてから再度お試しください';
 
 export type LoginState = {
     errors?: {
@@ -40,6 +51,16 @@ export async function login(
         return { errors: result.errors, values };
     }
     const { email, password } = result.data;
+
+    // レート制限: IP単位 → アカウント単位 の順にチェックする。
+    // どちらも「重い scrypt を走らせる前」に弾くことで、DoS対策にもなる。
+    const ip = await getClientIp();
+    if (!rateLimit(`login:ip:${ip}`, IP_MAX, IP_WINDOW_MS).allowed) {
+        return { message: TOO_MANY_REQUESTS_MESSAGE, values };
+    }
+    if (!rateLimit(`login:email:${email}`, EMAIL_MAX, EMAIL_WINDOW_MS).allowed) {
+        return { message: TOO_MANY_REQUESTS_MESSAGE, values };
+    }
 
     try{
         const [user] = await db

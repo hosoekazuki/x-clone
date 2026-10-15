@@ -1,0 +1,9 @@
+# イメージに入れないもの
+node_modules
+.next
+.git
+.vscode
+playground
+*.tsbuildinfo
+# 秘密情報はイメージに焼き込まず、起動時に環境変数として渡す
+.env*
