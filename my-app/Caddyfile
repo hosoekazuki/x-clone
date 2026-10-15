@@ -1,4 +1,8 @@
 # DOMAIN 宛てのアクセスを受けて、HTTPS証明書を自動で取得し、appコンテナへ渡す
 {$DOMAIN} {
+	# アクセスログを出す（docker compose logs caddy で見られる）
+	log {
+		format console
+	}
 	reverse_proxy app:3000
 }
